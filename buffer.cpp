@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-
+using namespace LCDDisplay;
 
 FrameBuffer::FrameBuffer(const char *fileName) {
 	int fbDevice=0;

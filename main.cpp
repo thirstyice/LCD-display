@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-
+using namespace LCDDisplay;
 
 int main(int argc, char const *argv[]) {
 	FrameBuffer buffer("/dev/fb1");
