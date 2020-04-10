@@ -7,5 +7,6 @@ int main(int argc, char const *argv[]) {
 	FrameBuffer buffer("/dev/fb1");
 	Screen screen(&buffer);
 	screen.drawRect(100, 100, 200,200, 0xff0000);
+	screen.drawPixel(200,200,0x00ff00);
 	return 0;
 }

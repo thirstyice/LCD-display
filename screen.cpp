@@ -49,3 +49,12 @@ void Screen::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) 
 		}
 	}
 }
+void Screen::drawPixel(int xLoc, int yLoc, uint32_t color) {
+	uint8_t blue = color;
+	uint8_t green = color >> 8;
+	uint8_t red = color >> 16;
+	// Update the screen array
+	screenArray[xLoc][yLoc]=color;
+	int pixel = yLoc*buffer->getXres()+xLoc;
+	buffer->draw(pixel, pixel+1, red, green, blue);
+}
