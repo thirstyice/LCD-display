@@ -1,6 +1,8 @@
-main : buffer.o
+main : screen.o buffer.o
 
-buffer.o : buffer.cpp buffer.h
+screen.o : buffer.o
+
+buffer.o :
 
 debug : CXXFLAGS += -D DEBUG
 debug : main
