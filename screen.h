@@ -3,17 +3,17 @@
 #include <cstdint>
 
 #include "buffer.h"
+#include "view.h"
 
 namespace LCDDisplay {
-	class Screen {
+	class Screen: protected View {
 	public:
-		Screen(FrameBuffer* initBuffer);
+		Screen(FrameBuffer* buffer);
 		~Screen();
-		void drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color);
-		void drawPixel(int xLoc, int yLoc, uint32_t color);
-		uint32_t bgColor = 0x000000;
+		void drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) override;
+		void drawPixel(int xLoc, int yLoc, uint32_t color) override;
 	private:
 		FrameBuffer* buffer;
-		uint32_t** screenArray;
+		//uint32_t** screenArray;
 	};
 }

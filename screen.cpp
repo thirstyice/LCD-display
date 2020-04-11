@@ -2,10 +2,11 @@
 
 using namespace LCDDisplay;
 
-Screen::Screen(FrameBuffer* initBuffer) {
+Screen::Screen(FrameBuffer* initBuffer):View(0,0,initBuffer->getXres(),initBuffer->getYres()) {
 	buffer=initBuffer;
+	setBgColor(bgColor);
+	drawBorders();
 
-	drawRect(0,0,buffer->getXres(), buffer->getYres(), bgColor);
 }
 Screen::~Screen() {
 

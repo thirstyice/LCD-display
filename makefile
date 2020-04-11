@@ -1,8 +1,8 @@
-main : screen.o buffer.o
+main : application.o screen.o buffer.o view.o
 
-screen.o : buffer.o
+application.o : screen.o buffer.o
 
-buffer.o :
+screen.o : buffer.o view.o
 
 debug : CXXFLAGS += -D DEBUG
 debug : main
