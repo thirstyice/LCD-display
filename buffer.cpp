@@ -56,14 +56,15 @@ void FrameBuffer::draw(int startPixel, int endPixel, uint8_t red, uint8_t green,
 			break;
 
 		} case 16: {
-			uint8_t colors[4] = {blue, blue, green, red};
-			for (int pixel=0;pixel<length;pixel++){
-				for (uint8_t byte=0; byte<2;byte++) {
-					uint8_t colorByte = ((colors[2*byte+1]/16) << 4) + (colors[2*byte]/16);
-					memset(start+(pixel*bytesPerPixel)+byte, colorByte, 1);
-				}
-			}
-			break;
+		// 	uint8_t colors[2] = {((blue/4)<<2) + ((red/8)>>3), (green/8) + ((red/8)<<5)};
+		// 	for (int pixel=0;pixel<length;pixel++){
+		// 		for (uint8_t byte=0; byte<2;byte++) {
+		// 			memset(start+(pixel*bytesPerPixel)+byte, colors[byte], 1);
+		// 		}
+		// 	}
+		uint8_t color= (green/32) + ((blue/64) << 3) + ((red / 32) << 5);
+		memset(start, color, length*2);
+		break;
 		} case 32: {
 			uint8_t colors[4] = {red, red, green, blue};
 			for (int pixel=0;pixel<length;pixel++){
