@@ -7,8 +7,8 @@ namespace LCDDisplay {
 	private:
 		/* data */
 		FrameBuffer* buffer;
-		Screen* screen;
 	public:
+		View* mainView;
 		Application();
 		virtual ~Application();
 	};

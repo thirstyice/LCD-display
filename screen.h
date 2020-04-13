@@ -6,7 +6,7 @@
 #include "view.h"
 
 namespace LCDDisplay {
-	class Screen: protected View {
+	class Screen: public View {
 	public:
 		Screen(FrameBuffer* buffer);
 		~Screen();
@@ -14,6 +14,5 @@ namespace LCDDisplay {
 		void drawPixel(int xLoc, int yLoc, uint32_t color) override;
 	private:
 		FrameBuffer* buffer;
-		//uint32_t** screenArray;
 	};
 }
