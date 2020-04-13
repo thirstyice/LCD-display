@@ -4,8 +4,7 @@ using namespace LCDDisplay;
 
 Screen::Screen(FrameBuffer* initBuffer):View(0,0,initBuffer->getXres(),initBuffer->getYres()) {
 	buffer=initBuffer;
-	setBgColor(bgColor);
-	drawBorders();
+	draw();
 
 }
 Screen::~Screen() {
