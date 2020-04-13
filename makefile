@@ -4,7 +4,7 @@ application.o : screen.o buffer.o
 
 screen.o : buffer.o view.o
 
-debug : CXXFLAGS += -D DEBUG
+debug : CXXFLAGS += -D DEBUG -ggdb
 debug : main
 
 clean :
