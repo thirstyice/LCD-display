@@ -34,27 +34,36 @@ View::View(int xLoc, int yLoc, int xSize, int ySize) {
 	viewHeight=ySize;
 }
 View::~View() {
-
+ if (parent) {
+	 parent->childWasRemoved(this);
+ }
 }
 void View::resize(int xSize, int ySize) {
-	bool needsParentUpdate = true;
-	if  (xSize>=viewWidth&&ySize>=viewHeight) {
-		// We don't need to worry about telling parent to redraw areas that were covered
-		needsParentUpdate=false;
-	}
+	int xOldSize=viewWidth;
+	int yOldSize=viewHeight;
 	viewWidth=xSize;
 	viewHeight=ySize;
 	draw();
-	if (needsParentUpdate) {
-		//TODO
+	if (xSize<viewWidth) {
+		// Update for horizontal shrinkage
+		parent->updateArea(xViewLoc+xSize, yViewLoc ,xOldSize-xSize, yOldSize);
+	}
+	if (ySize<viewHeight) {
+		// Update for vertical shrinkage
+		parent->updateArea(xViewLoc, yViewLoc+ySize, xOldSize, yOldSize-ySize);
 	}
 
 }
 void View::move(int xLoc, int yLoc) {
-
+	int xOldLoc=xViewLoc;
+	int yOldLoc=yViewLoc;
+	xViewLoc=xLoc;
+	yViewLoc=yLoc;
+	draw();
+	parent->updateArea(xOldLoc, yOldLoc, viewWidth, viewHeight);
 }
-void View::setBorder(int top, int bot, int left, int right) {
-
+void View::setBorders(int top, int bot, int left, int right) {
+	// TODO
 } // Pass -1 to keep current
 void View::draw() {
 	drawBg();
@@ -67,7 +76,7 @@ void View::setBgColor(uint32_t color) {
 void View::drawBg() {
 	drawRect(borderLeft,borderTop,viewWidth-borderLeft-borderRight,
 		viewHeight-borderTop-borderBottom, bgColor);
-	// TODO: redraw children
+	drawAllChildren();
 }
 void View::setBorderColor(uint32_t color) {
 	borderColor=color;
@@ -102,13 +111,31 @@ void View::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) {
 	}
 }
 void View::drawPixel(int xLoc, int yLoc, uint32_t color) {
-
+	if (parent) {
+		parent->drawPixel(xLoc, yLoc, color);
+	}
 }
-View** View::getChildren() {
-	//TODO
-	return 0;
+View** View::getChildrenArrayAddress() {
+	return children;
+}
+int View::getChildCount() {
+	return childCount;
+}
+void View::drawChild(View* child) {
+	child->draw();
+}
+void View::drawAllChildren() {
+	for (int child=0; child<childCount; child++) {
+		drawChild(children[child]);
+	}
 }
 void View::addChild(View* view) {
 	view->parent=this;
+	// TODO add child to pointer array
+	this->childCount++;
 	view->draw();
+}
+void View::childWasRemoved(View* child) {
+	// TODO remove child from pointer array
+	this->childCount--;
 }
