@@ -22,7 +22,6 @@
 namespace LCDDisplay {
 	class Application {
 	private:
-		/* data */
 		FrameBuffer* buffer;
 	public:
 		View* mainView;

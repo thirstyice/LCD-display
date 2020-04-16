@@ -27,7 +27,7 @@ namespace LCDDisplay {
 		int borderTopWidth=2;
 		int borderBottomWidth=2;
 		View* parent = 0;
-		View** children = 0;
+		View* children [64];
 		int childCount = 0;
 		virtual void drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color);
 		virtual void drawPixel(int xLoc, int yLoc, uint32_t color);

@@ -44,11 +44,11 @@ void View::resize(int xSize, int ySize) {
 	viewWidth=xSize;
 	viewHeight=ySize;
 	draw();
-	if (xSize<viewWidth) {
+	if (xSize<xOldSize) {
 		// Update for horizontal shrinkage
 		parent->updateArea(xViewLoc+xSize, yViewLoc ,xOldSize-xSize, yOldSize);
 	}
-	if (ySize<viewHeight) {
+	if (ySize<yOldSize) {
 		// Update for vertical shrinkage
 		parent->updateArea(xViewLoc, yViewLoc+ySize, xOldSize, yOldSize-ySize);
 	}
@@ -115,8 +115,15 @@ void View::updateArea(int xLoc, int yLoc, int xSize, int ySize) {
 		drawRect(xLoc, viewHeight-borderBottomWidth, xSize, viewHeight-(ySize+yLoc), borderColor);
 	}
 	drawRect(xLoc, yLoc, xSize, ySize, bgColor);
-
-	// TODO Redraw children that overlap with area
+	for (int i=0; i<childCount; i++) {
+		if (xLoc<=children[i]->xViewLoc + children[i]->viewWidth &&
+			xLoc+xSize>=children[i]->xViewLoc &&
+			yLoc<=children[i]->yViewLoc + children[i]->viewHeight &&
+			yLoc+ySize>=children[i]->yViewLoc)
+		{
+			children[i]->draw();
+		}
+	}
 }
 void View::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) {
 	if (parent) {
@@ -142,13 +149,28 @@ void View::drawAllChildren() {
 		drawChild(children[child]);
 	}
 }
-void View::addChild(View* view) {
-	view->parent=this;
-	// TODO add child to pointer array
+void View::addChild(View* child) {
+	if (childCount>=64) {
+		printf("View::addChild: view already has max children\n");
+		return;
+	}
+	child->parent=this;
+	children[childCount]=child;
 	this->childCount++;
-	view->draw();
+	child->draw();
 }
 void View::childWasRemoved(View* child) {
-	// TODO remove child from pointer array
+	bool childWasFound=false;
+	for (int i = 0; i<childCount; i++) {
+		if (children[i]==child) {
+			childWasFound=true;
+		}
+		if (childWasFound==true) {
+			children[i]=children[i+1];
+		}
+	}
 	this->childCount--;
+	if (childWasFound==false) {
+		printf("View::childWasRemoved: could not find matching child\n");
+	}
 }
