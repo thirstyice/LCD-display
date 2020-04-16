@@ -22,10 +22,10 @@
 namespace LCDDisplay {
 	class View {
 	protected:
-		int borderLeft=2;
-		int borderRight=2;
-		int borderTop=2;
-		int borderBottom=2;
+		int borderLeftWidth=2;
+		int borderRightWidth=2;
+		int borderTopWidth=2;
+		int borderBottomWidth=2;
 		View* parent = 0;
 		View** children = 0;
 		int childCount = 0;
@@ -46,13 +46,13 @@ namespace LCDDisplay {
 		void drawChild(View* child);
 		void drawAllChildren();
 	public:
-		// enum borders {borderLeft, borderRight, borderTop, borderBottom};
+		enum borders {borderLeft=1, borderRight=2, borderTop=4, borderBottom=8};
 		View(int xLoc, int yLoc);
 		View(int xLoc, int yLoc, int xSize, int ySize);
 		~View();
 		void resize(int xSize, int ySize);
 		void move(int xLoc, int yLoc);
-		void setBorders(int top, int bot, int left, int right); // Pass -1 to keep current
+		void setBorders(borders border, int size); // Pass -1 to keep current
 		virtual void draw();
 		virtual void updateArea(int xLoc, int yLoc, int xSize, int ySize);
 		void setBgColor(uint32_t color);

@@ -62,8 +62,21 @@ void View::move(int xLoc, int yLoc) {
 	draw();
 	parent->updateArea(xOldLoc, yOldLoc, viewWidth, viewHeight);
 }
-void View::setBorders(int top, int bot, int left, int right) {
-	// TODO
+void View::setBorders(borders border, int size) {
+	// left right top bottom
+	if ((border&1)!=0) {
+		borderLeftWidth=size;
+	}
+	if ((border&2)!=0) {
+		borderRightWidth=size;
+	}
+	if ((border&4)!=0) {
+		borderTopWidth=size;
+	}
+	if ((border&8)!=0) {
+		borderBottomWidth=size;
+	}
+	drawBorders();
 } // Pass -1 to keep current
 void View::draw() {
 	drawBg();
@@ -74,8 +87,8 @@ void View::setBgColor(uint32_t color) {
 	drawBg();
 }
 void View::drawBg() {
-	drawRect(borderLeft,borderTop,viewWidth-borderLeft-borderRight,
-		viewHeight-borderTop-borderBottom, bgColor);
+	drawRect(borderLeftWidth,borderTopWidth,viewWidth-borderLeftWidth-borderRightWidth,
+		viewHeight-borderTopWidth-borderBottomWidth, bgColor);
 	drawAllChildren();
 }
 void View::setBorderColor(uint32_t color) {
@@ -83,23 +96,23 @@ void View::setBorderColor(uint32_t color) {
 	drawBorders();
 }
 void View::drawBorders() {
-	drawRect(0,0,borderLeft,viewHeight, borderColor);
-	drawRect(0,0,viewWidth,borderTop, borderColor);
-	drawRect(0,viewHeight-borderBottom,viewWidth,borderBottom, borderColor);
-	drawRect(viewWidth-borderRight,0,borderRight,viewHeight, borderColor);
+	drawRect(0,0,borderLeftWidth,viewHeight, borderColor);
+	drawRect(0,0,viewWidth,borderTopWidth, borderColor);
+	drawRect(0,viewHeight-borderBottomWidth,viewWidth,borderBottomWidth, borderColor);
+	drawRect(viewWidth-borderRightWidth,0,borderRightWidth,viewHeight, borderColor);
 }
 void View::updateArea(int xLoc, int yLoc, int xSize, int ySize) {
-	if (xLoc <= borderLeft) {
-		drawRect(xLoc, yLoc, borderLeft-xLoc, ySize, borderColor);
+	if (xLoc <= borderLeftWidth) {
+		drawRect(xLoc, yLoc, borderLeftWidth-xLoc, ySize, borderColor);
 	}
-	if (yLoc <= borderTop) {
-		drawRect(xLoc, yLoc, xSize, borderTop-yLoc, borderColor);
+	if (yLoc <= borderTopWidth) {
+		drawRect(xLoc, yLoc, xSize, borderTopWidth-yLoc, borderColor);
 	}
-	if (xLoc+xSize > viewWidth-borderRight) {
-		drawRect(viewWidth-borderRight, yLoc, viewWidth-(xLoc+xSize), ySize, borderColor);
+	if (xLoc+xSize > viewWidth-borderRightWidth) {
+		drawRect(viewWidth-borderRightWidth, yLoc, viewWidth-(xLoc+xSize), ySize, borderColor);
 	}
-	if (yLoc+ySize > viewHeight-borderBottom) {
-		drawRect(xLoc, viewHeight-borderBottom, xSize, viewHeight-(ySize+yLoc), borderColor);
+	if (yLoc+ySize > viewHeight-borderBottomWidth) {
+		drawRect(xLoc, viewHeight-borderBottomWidth, xSize, viewHeight-(ySize+yLoc), borderColor);
 	}
 	drawRect(xLoc, yLoc, xSize, ySize, bgColor);
 
