@@ -127,6 +127,24 @@ void View::updateArea(int xLoc, int yLoc, int xSize, int ySize) {
 }
 void View::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) {
 	if (parent) {
+		if (xLoc>=viewWidth||yLoc>=viewHeight||(xLoc+xSize)<0||(yLoc+ySize)<0) {
+			// Don't even bother trying to draw rectangles that are outside the visible area
+			return;
+		}
+		if (xLoc<0) {
+			xSize+=xLoc;
+			xLoc=0;
+		}
+		if (yLoc<0) {
+			ySize+=yLoc;
+			yLoc=0;
+		}
+		if ((xLoc+xSize)>(viewWidth)) {
+			xSize=viewWidth-xLoc;
+		}
+		if ((yLoc+ySize)>viewHeight) {
+			ySize=viewHeight-xLoc;
+		}
 		parent->drawRect(xViewLoc+xLoc,yViewLoc+yLoc, xSize, ySize, color);
 	}
 }
