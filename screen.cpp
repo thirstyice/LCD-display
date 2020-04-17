@@ -27,6 +27,24 @@ Screen::~Screen() {
 
 }
 void Screen::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) {
+	if (xLoc>=viewWidth||yLoc>=viewHeight||(xLoc+xSize)<0||(yLoc+ySize)<0) {
+		// Don't even bother trying to draw rectangles that are outside the visible area
+		return;
+	}
+	if (xLoc<0) {
+		xSize+=xLoc;
+		xLoc=0;
+	}
+	if (yLoc<0) {
+		ySize+=yLoc;
+		yLoc=0;
+	}
+	if ((xLoc+xSize)>(viewWidth)) {
+		xSize=viewWidth-xLoc;
+	}
+	if ((yLoc+ySize)>viewHeight) {
+		ySize=viewHeight-xLoc;
+	}
 	if (xSize==0||ySize==0) {
 		return;
 	}
@@ -37,12 +55,6 @@ void Screen::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) 
 	uint8_t blue = color;
 	uint8_t green = color >> 8;
 	uint8_t red = color >> 16;
-	if (xLoc+xSize>buffer->getXres()) {
-		xSize=buffer->getXres()-xLoc;
-	}
-	if (yLoc+ySize>buffer->getYres()) {
-		ySize=buffer->getYres()-yLoc;
-	}
 	if (xLoc==0&&xSize==buffer->getXres()) {
 		// We can draw in one command
 		int start = yLoc*buffer->getXres()+xLoc;

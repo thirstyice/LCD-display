@@ -62,18 +62,18 @@ void View::move(int xLoc, int yLoc) {
 	draw();
 	parent->updateArea(xOldLoc, yOldLoc, viewWidth, viewHeight);
 }
-void View::setBorders(borders border, int size) {
+void View::setBorders(int borders, int size) {
 	// left right top bottom
-	if ((border&1)!=0) {
+	if ((borders&1)!=0) {
 		borderLeftWidth=size;
 	}
-	if ((border&2)!=0) {
+	if ((borders&2)!=0) {
 		borderRightWidth=size;
 	}
-	if ((border&4)!=0) {
+	if ((borders&4)!=0) {
 		borderTopWidth=size;
 	}
-	if ((border&8)!=0) {
+	if ((borders&8)!=0) {
 		borderBottomWidth=size;
 	}
 	drawBorders();
@@ -102,6 +102,7 @@ void View::drawBorders() {
 	drawRect(viewWidth-borderRightWidth,0,borderRightWidth,viewHeight, borderColor);
 }
 void View::updateArea(int xLoc, int yLoc, int xSize, int ySize) {
+	drawRect(xLoc, yLoc, xSize, ySize, bgColor);
 	if (xLoc <= borderLeftWidth) {
 		drawRect(xLoc, yLoc, borderLeftWidth-xLoc, ySize, borderColor);
 	}
@@ -114,7 +115,6 @@ void View::updateArea(int xLoc, int yLoc, int xSize, int ySize) {
 	if (yLoc+ySize > viewHeight-borderBottomWidth) {
 		drawRect(xLoc, viewHeight-borderBottomWidth, xSize, viewHeight-(ySize+yLoc), borderColor);
 	}
-	drawRect(xLoc, yLoc, xSize, ySize, bgColor);
 	for (int i=0; i<childCount; i++) {
 		if (xLoc<=children[i]->xViewLoc + children[i]->viewWidth &&
 			xLoc+xSize>=children[i]->xViewLoc &&
