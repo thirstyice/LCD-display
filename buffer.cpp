@@ -80,6 +80,9 @@ void FrameBuffer::draw(int startPixel, int endPixel, uint8_t red, uint8_t green,
 		// 		}
 		// 	}
 		uint8_t color= (green/32) + ((blue/64) << 3) + ((red / 32) << 5);
+#ifdef DEBUG
+		printf("Drawing at:%i for:%i ending:%i\n",start,length,start+length);
+#endif //DEBUG
 		memset(start, color, length*2);
 		break;
 		} case 32: {
