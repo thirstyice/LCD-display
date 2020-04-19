@@ -39,11 +39,11 @@ void Screen::drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) 
 		ySize+=yLoc;
 		yLoc=0;
 	}
-	if ((xLoc+xSize)>(viewWidth)) {
+	if ((xLoc+xSize)>=(viewWidth)) {
 		xSize=viewWidth-xLoc;
 	}
-	if ((yLoc+ySize)>viewHeight) {
-		ySize=viewHeight-xLoc;
+	if ((yLoc+ySize)>=viewHeight) {
+		ySize=viewHeight-yLoc;
 	}
 	if (xSize==0||ySize==0) {
 		return;
