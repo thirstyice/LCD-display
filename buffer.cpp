@@ -44,7 +44,7 @@ FrameBuffer::FrameBuffer(const char *fileName) {
 	}
 #ifdef DEBUG
 	printf("The framebuffer device %s was opened successfully.\n", fileName);
-	printf("Start + size: %i + %i\n",(int)fbPointer,fbSize);
+	printf("Start:%i size:%i ending:%i\n",(int)fbPointer,fbSize,(int)fbPointer-fbSize);
 #endif // DEBUG
 	// cleanup
 	close(fbDevice);
@@ -81,7 +81,7 @@ void FrameBuffer::draw(int startPixel, int endPixel, uint8_t red, uint8_t green,
 		// 	}
 		uint8_t color= (green/32) + ((blue/64) << 3) + ((red / 32) << 5);
 #ifdef DEBUG
-		printf("Drawing at:%i for:%i ending:%i\n",start,length,start+length);
+		printf("Drawing at:%i for:%i ending:%i\n",start,length*2,start+(length*2));
 #endif //DEBUG
 		memset(start, color, length*2);
 		break;
