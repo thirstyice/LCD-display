@@ -1,4 +1,4 @@
-sources = display.cpp screen.cpp view.cpp
+sources = screen.cpp view.cpp
 
 display.a : $(sources:.cpp=.o)
 	ar ru $@ $^

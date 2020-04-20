@@ -6,10 +6,10 @@
 using namespace LCDDisplay;
 
 int main(int argc, char const *argv[]) {
-	View* screen = new Screen();
+	Screen screen = Screen();
 	View testView = View(-5,-5,50,50);
 	testView.setBgColor(0xff0000);
-	screen->addChild(&testView);
+	screen.addChild(&testView);
 	std::cin.ignore();
 	View view2 = View(10,10,50,50);
 	view2.setBgColor(0x00ff00);
