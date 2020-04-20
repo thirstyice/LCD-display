@@ -1,11 +1,10 @@
-main : application.o screen.o buffer.o view.o
+main : display/display.a display/display.h
 
-application.o : screen.o buffer.o
-
-screen.o : buffer.o view.o
+display/display.a :
+	$(MAKE) -C $(dir $(@))
 
 debug : CXXFLAGS += -D DEBUG -ggdb
 debug : main
 
 clean :
-	rm main *.o
+	rm -f main *.o

@@ -2,3 +2,5 @@
 main
 *.o
 .tags
+*.a
+*.make
