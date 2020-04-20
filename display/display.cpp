@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>
 //
 
-#include "application.h"
+#include "display.h"
 
 using namespace LCDDisplay;
 

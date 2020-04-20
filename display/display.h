@@ -20,12 +20,12 @@
 #include "screen.h"
 
 namespace LCDDisplay {
-	class Application {
+	class Display {
 	private:
 		FrameBuffer* buffer;
 	public:
 		View* mainView;
-		Application();
-		virtual ~Application();
+		Display();
+		virtual ~Display();
 	};
 } /* LCDDisplay */
