@@ -1,4 +1,4 @@
-main : display/display.a display/display.h
+main : display/display.a display/screen.h display/view.h
 
 display/display.a :
 	$(MAKE) -C $(dir $(@))
