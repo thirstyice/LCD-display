@@ -1,4 +1,4 @@
-sources = screen.cpp view.cpp
+sources = screen.cpp view.cpp touch.cpp
 
 display.a : $(sources:.cpp=.o)
 	ar ru $@ $^
@@ -16,4 +16,4 @@ debug : CXXFLAGS += -D DEBUG -ggdb
 debug : display.a
 
 clean:
-	rm -f *.a *.o *.make
+	$(RM) *.a *.o *.make

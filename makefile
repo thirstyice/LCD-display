@@ -1,5 +1,6 @@
 sources= main.cpp
 CC=$(CXX)
+LDLIBS += -levdev -lpthread
 
 main : display/display.a
 
@@ -23,5 +24,5 @@ debug : CXXFLAGS += -D DEBUG -ggdb
 debug : main
 
 clean :
-	rm -f main *.o *.make
+	$(RM) main *.o *.make
 	$(MAKE) -C display/ clean

@@ -1,4 +1,5 @@
 #include "display/screen.h"
+#include "display/touch.h"
 #include "display/view.h"
 
 #include <iostream>
@@ -7,6 +8,7 @@ using namespace LCDDisplay;
 
 int main(int argc, char const *argv[]) {
 	Screen screen = Screen();
+	Touchscreen touchscreen(&screen);
 	View testView = View(-5,-5,50,50);
 	testView.setBgColor(0xff0000);
 	screen.addChild(&testView);

@@ -24,16 +24,9 @@
 
 #include "touch.h"
 
-using namespace LCDTouch;
+using namespace LCDDisplay;
 
-int main(int argc, char const *argv[]) {
-	Touchscreen touch = Touchscreen();
-	std::cin.ignore();
-	return 0;
-}
-
-
-Touchscreen::Touchscreen(const char * device) {
+Touchscreen::Touchscreen(Screen* screen, const char * device) {
 	fileDescriptor = open(device, O_RDONLY|O_NONBLOCK);
 	evReciever = libevdev_new_from_fd(fileDescriptor, &evDevice);
 	if (evReciever < 0) {
@@ -43,7 +36,6 @@ Touchscreen::Touchscreen(const char * device) {
 	listenerThread = new std::thread(&Touchscreen::listenForEvents, this);
 }
 Touchscreen::~Touchscreen() {
-	delete listenerThread;
 	close(fileDescriptor);
 }
 void Touchscreen::listenForEvents() {
@@ -51,15 +43,19 @@ void Touchscreen::listenForEvents() {
 		struct input_event ev;
 		evReciever = libevdev_next_event(evDevice, LIBEVDEV_READ_FLAG_NORMAL, &ev);
 		if (evReciever == 0) {
+			#ifdef DEBUG
 			printf("Event recieved: %s %s %d\n",
 				libevdev_event_type_get_name(ev.type),
 				libevdev_event_code_get_name(ev.type, ev.code),
 				ev.value);
+			#endif // DEBUG
 			eventRecieved(ev.type, ev.code, ev.value);
 		}
 		if (initialTouchTime!=std::chrono::steady_clock::time_point::min()) {
 			if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-initialTouchTime).count()>holdThresh) {
 				recievedHold();
+				initialTouchTime=std::chrono::steady_clock::time_point::min();
+				// Now that we know we're holding, don't care when the initial touch happened
 			}
 		}
 	} while (evReciever == 1 || evReciever == 0 || evReciever == -EAGAIN);
@@ -117,8 +113,11 @@ void Touchscreen::recievedTouchDown() {
 	printf("Touch at: %i,%i\n", initialTouchX, initialTouchY);
 }
 void Touchscreen::recievedMove() {
-
+	printf("Move to: %i,%i\n", touchX, touchY);
 }
 void Touchscreen::recievedHold() {
+	printf("Recieved hold\n");
+}
+void Touchscreen::calibrate() {
 
 }

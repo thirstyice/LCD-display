@@ -19,14 +19,17 @@
 
 #include <libevdev-1.0/libevdev/libevdev.h>
 
-namespace LCDTouch {
+#include "screen.h"
+
+namespace LCDDisplay {
 	class Touchscreen {
 	private:
 		int fileDescriptor = 0;
 		int evReciever = 1;
 		struct libevdev* evDevice=0;
+		Screen* screen;
 		int dragThresh = 10; // # of pixels before a touch becomes a drag
-		int holdThresh = 250; // # of miliseconds before a click becomes a hold
+		int holdThresh = 1000; // # of miliseconds before a click becomes a hold
 		std::thread* listenerThread;
 		void listenForEvents();
 		void eventRecieved(unsigned int type, unsigned int code, int value);
@@ -50,8 +53,9 @@ namespace LCDTouch {
 		int touchWidth;
 		int touchHeight;
 	public:
-		Touchscreen(const char * device = "/dev/input/event0");
+		Touchscreen(Screen* screen, const char * device = "/dev/input/event0");
 		virtual ~Touchscreen();
+		void calibrate();
 		// void onTouchDownEventDo(void(*functionPointer)());
 	};
 } /* LCDTouch */
