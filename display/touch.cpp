@@ -17,6 +17,7 @@
 
 #include <fcntl.h>
 #include <iostream>
+#include <string>
 #include <unistd.h>
 #include <errno.h>
 
@@ -27,6 +28,48 @@
 using namespace LCDDisplay;
 
 Touchscreen::Touchscreen(Screen* screen, const char * device) {
+	// load config
+	confFile.open("/etc/spi-display.conf", ios::in | ios::out)
+	if (confFile.is_open()) {
+		// Setup options from file
+		std::istream conf (&confFile);
+		std::string line;
+		while (std::getline(conf, line) {
+			std::istringstream lineStream (line);
+			std::string key;
+			if( std::getline(lineStream, key, '=') ) {
+				std::string value;
+				if( std::getline(lineStream, value) ) {
+					// update variables
+					switch (key) {
+						case "touchZeroX": {
+							touchZeroX = (int)value;
+							break;
+						} case "touchZeroY": {
+							touchZeroY = (int)value;
+							break;
+						} case "touchWidth": {
+							touchWidth = (int)value;
+							break;
+						} case "touchHeight": {
+							touchHeight = (int)value;
+							break;
+						} case "dragThresh": {
+							dragThresh = (int)value;
+							break;
+						} case "holdThresh": {
+							holdThresh = (int)value;
+							break;
+						} default: {
+							std::cout << "ConfFile: unrecognized key:" << key << '\n';
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	fileDescriptor = open(device, O_RDONLY|O_NONBLOCK);
 	evReciever = libevdev_new_from_fd(fileDescriptor, &evDevice);
 	if (evReciever < 0) {
@@ -34,9 +77,17 @@ Touchscreen::Touchscreen(Screen* screen, const char * device) {
 		return;
 	}
 	listenerThread = new std::thread(&Touchscreen::listenForEvents, this);
+	if (!confFile.is_open()) {
+		confFile.open("/etc/spi-display.conf", ios::out);
+		if (!confFile.is_open()) {
+			std::cerr << "Conf file could not be opened or created; all configuration will be temporary" << '\n';
+		}
+		calibrate();
+	}
 }
 Touchscreen::~Touchscreen() {
 	close(fileDescriptor);
+	confFile.close();
 }
 void Touchscreen::listenForEvents() {
 	do {
@@ -119,5 +170,9 @@ void Touchscreen::recievedHold() {
 	printf("Recieved hold\n");
 }
 void Touchscreen::calibrate() {
-
+	// do the Calibration
+	
+	if (confFile.is_open()) {
+		//write variables to file
+	}
 }

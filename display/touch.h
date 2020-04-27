@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>
 //
 #include <chrono>
+#include <fstream>
 #include <thread>
 
 #include <libevdev-1.0/libevdev/libevdev.h>
@@ -24,12 +25,11 @@
 namespace LCDDisplay {
 	class Touchscreen {
 	private:
+		fstream confFile = 0;
 		int fileDescriptor = 0;
 		int evReciever = 1;
 		struct libevdev* evDevice=0;
 		Screen* screen;
-		int dragThresh = 10; // # of pixels before a touch becomes a drag
-		int holdThresh = 1000; // # of miliseconds before a click becomes a hold
 		std::thread* listenerThread;
 		void listenForEvents();
 		void eventRecieved(unsigned int type, unsigned int code, int value);
@@ -48,10 +48,12 @@ namespace LCDDisplay {
 		int touchY = -1;
 
 		// Calibration info
-		int touchZeroLocX;
-		int touchZeroLocY;
+		int touchZeroX;
+		int touchZeroY;
 		int touchWidth;
 		int touchHeight;
+		int dragThresh = 10; // # of pixels before a touch becomes a drag
+		int holdThresh = 1000; // # of miliseconds before a click becomes a hold
 	public:
 		Touchscreen(Screen* screen, const char * device = "/dev/input/event0");
 		virtual ~Touchscreen();
