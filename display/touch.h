@@ -25,7 +25,7 @@
 namespace LCDDisplay {
 	class Touchscreen {
 	private:
-		fstream confFile = 0;
+		std::fstream confFile;
 		int fileDescriptor = 0;
 		int evReciever = 1;
 		struct libevdev* evDevice=0;

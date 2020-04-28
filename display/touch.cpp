@@ -17,6 +17,7 @@
 
 #include <fcntl.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 #include <errno.h>
@@ -29,41 +30,32 @@ using namespace LCDDisplay;
 
 Touchscreen::Touchscreen(Screen* screen, const char * device) {
 	// load config
-	confFile.open("/etc/spi-display.conf", ios::in | ios::out)
+	confFile.open("/etc/spi-display.conf", std::ios::in | std::ios::out);
 	if (confFile.is_open()) {
 		// Setup options from file
-		std::istream conf (&confFile);
+		std::istream& conf = confFile;
 		std::string line;
-		while (std::getline(conf, line) {
+		while (std::getline(conf, line)) {
 			std::istringstream lineStream (line);
 			std::string key;
 			if( std::getline(lineStream, key, '=') ) {
 				std::string value;
 				if( std::getline(lineStream, value) ) {
 					// update variables
-					switch (key) {
-						case "touchZeroX": {
-							touchZeroX = (int)value;
-							break;
-						} case "touchZeroY": {
-							touchZeroY = (int)value;
-							break;
-						} case "touchWidth": {
-							touchWidth = (int)value;
-							break;
-						} case "touchHeight": {
-							touchHeight = (int)value;
-							break;
-						} case "dragThresh": {
-							dragThresh = (int)value;
-							break;
-						} case "holdThresh": {
-							holdThresh = (int)value;
-							break;
-						} default: {
-							std::cout << "ConfFile: unrecognized key:" << key << '\n';
-							break;
-						}
+					if (key=="touchZeroX") {
+						touchZeroX = std::stoi(value);
+					} else if (key=="touchZeroY") {
+						touchZeroY = std::stoi(value);
+					} else if (key=="touchWidth") {
+						touchWidth = std::stoi(value);
+					} else if (key=="touchHeight") {
+						touchHeight = std::stoi(value);
+					} else if (key=="dragThresh") {
+						dragThresh = std::stoi(value);
+					} else if (key=="holdThresh") {
+						holdThresh = std::stoi(value);
+					} else {
+						std::cout << "ConfFile: unrecognized key:" << key << '\n';
 					}
 				}
 			}
@@ -78,7 +70,7 @@ Touchscreen::Touchscreen(Screen* screen, const char * device) {
 	}
 	listenerThread = new std::thread(&Touchscreen::listenForEvents, this);
 	if (!confFile.is_open()) {
-		confFile.open("/etc/spi-display.conf", ios::out);
+		confFile.open("/etc/spi-display.conf", std::ios::out);
 		if (!confFile.is_open()) {
 			std::cerr << "Conf file could not be opened or created; all configuration will be temporary" << '\n';
 		}
