@@ -24,12 +24,13 @@
 
 namespace LCDDisplay {
 	class Screen: public View {
+		friend class Touchscreen;
 	public:
 		Screen(const char* buffer = "/dev/fb1");
 		~Screen();
+	private:
 		void drawRect(int xLoc, int yLoc, int xSize, int ySize, uint32_t color) override;
 		void drawPixel(int xLoc, int yLoc, uint32_t color) override;
-	private:
 		void bufferDraw(int startPixel, int endPixel, uint8_t red, uint8_t green, uint8_t blue);
 		unsigned char *fbPointer = 0;
 		struct fb_var_screeninfo fbVarInfo;

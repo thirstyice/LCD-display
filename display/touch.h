@@ -14,8 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>
 //
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <fstream>
+#include <mutex>
 #include <thread>
 
 #include <libevdev-1.0/libevdev/libevdev.h>
@@ -46,6 +49,13 @@ namespace LCDDisplay {
 		bool draggging = false;
 		int touchX = -1;
 		int touchY = -1;
+
+		// Calibration threading variables
+		std::mutex caliMutex;
+		std::condition_variable caliConditionVariable;
+		bool caliWaitingForTouch = false;
+		std::atomic<bool> calibrating;
+		void calibratePoint(int* screenLocation, int* touchPoint);
 
 		// Calibration info
 		int touchZeroX;

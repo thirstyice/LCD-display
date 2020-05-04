@@ -28,7 +28,10 @@
 
 using namespace LCDDisplay;
 
-Touchscreen::Touchscreen(Screen* screen, const char * device) {
+Touchscreen::Touchscreen(Screen* tmpScreen, const char * device) {
+	screen=tmpScreen;
+	calibrating=false;
+
 	// load config
 	confFile.open("/etc/spi-display.conf", std::ios::in | std::ios::out);
 	if (confFile.is_open()) {
@@ -123,7 +126,6 @@ void Touchscreen::eventRecieved(unsigned int type, unsigned int code, int value)
 						initialTouchX=value;
 						if (initialTouchY>=0) {
 							recievedTouchDown();
-							initialTouch=false;
 						}
 					} else {
 						recievedMove();
@@ -135,7 +137,6 @@ void Touchscreen::eventRecieved(unsigned int type, unsigned int code, int value)
 						initialTouchY=value;
 						if (initialTouchX>=0) {
 							recievedTouchDown();
-							initialTouch=false;
 						}
 					} else {
 						recievedMove();
@@ -154,6 +155,12 @@ void Touchscreen::recievedTouchUp() {
 }
 void Touchscreen::recievedTouchDown() {
 	printf("Touch at: %i,%i\n", initialTouchX, initialTouchY);
+	if (calibrating==true) {
+		std::lock_guard<std::mutex> lk(caliMutex);
+		caliWaitingForTouch=false;
+		caliConditionVariable.notify_one();
+	}
+	initialTouch=false;
 }
 void Touchscreen::recievedMove() {
 	printf("Move to: %i,%i\n", touchX, touchY);
@@ -162,9 +169,35 @@ void Touchscreen::recievedHold() {
 	printf("Recieved hold\n");
 }
 void Touchscreen::calibrate() {
+	calibrating=true;
+	int screenPoint1[2] = {50,50};
+	int screenPoint2[2] = {50,screen->viewHeight-50};
+	int screenPoint3[2] = {screen->viewWidth-50, 50};
+	int touchPoint1[2];
+	int touchPoint2[2];
+	int touchPoint3[2];
 	// do the Calibration
 	
+	calibratePoint(screenPoint1, touchPoint1);
+	calibratePoint(screenPoint2, touchPoint2);
+	calibratePoint(screenPoint3, touchPoint3);
+	calibrating=false;
+	screen->draw();
 	if (confFile.is_open()) {
 		//write variables to file
 	}
+}
+void Touchscreen::calibratePoint(int* screenLocation, int* touchPoint) {
+	screen->drawRect(0,0,screen->viewWidth,screen->viewHeight,0x000000);
+	screen->drawRect(screenLocation[0]-5,screenLocation[1]-5,10,10,0x444444);
+	screen->drawRect(screenLocation[0]-5,screenLocation[1],10,1,0xffffff);
+	screen->drawRect(screenLocation[0],screenLocation[1]-5,1,10,0xffffff);
+	caliWaitingForTouch=true;
+	std::unique_lock<std::mutex> lk(caliMutex);
+	// Can't use wait(lock, predi) for a non-static variable
+	while (caliWaitingForTouch==true) {
+		caliConditionVariable.wait(lk);
+	}
+	touchPoint[0]=initialTouchX;
+	touchPoint[1]=initialTouchY;
 }
