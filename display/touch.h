@@ -62,6 +62,7 @@ namespace LCDDisplay {
 		int touchZeroY;
 		int touchWidth;
 		int touchHeight;
+		bool touchFlipXY;
 		int dragThresh = 10; // # of pixels before a touch becomes a drag
 		int holdThresh = 1000; // # of miliseconds before a click becomes a hold
 	public:

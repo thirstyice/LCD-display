@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>
 //
 
+#include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
 #include <sstream>
@@ -57,6 +58,9 @@ Touchscreen::Touchscreen(Screen* tmpScreen, const char * device) {
 						dragThresh = std::stoi(value);
 					} else if (key=="holdThresh") {
 						holdThresh = std::stoi(value);
+					} else if (key=="touchFlipXY") {
+						// assert(value=="true"||value=="false");
+						touchFlipXY=(value=="true");
 					} else {
 						std::cout << "ConfFile: unrecognized key:" << key << '\n';
 					}
@@ -170,17 +174,32 @@ void Touchscreen::recievedHold() {
 }
 void Touchscreen::calibrate() {
 	calibrating=true;
-	int screenPoint1[2] = {50,50};
-	int screenPoint2[2] = {50,screen->viewHeight-50};
-	int screenPoint3[2] = {screen->viewWidth-50, 50};
-	int touchPoint1[2];
-	int touchPoint2[2];
-	int touchPoint3[2];
-	// do the Calibration
-	
-	calibratePoint(screenPoint1, touchPoint1);
-	calibratePoint(screenPoint2, touchPoint2);
-	calibratePoint(screenPoint3, touchPoint3);
+	int screenPointXY[2] = {50,50};
+	int screenPointX[2] = {screen->viewWidth-50, 50};
+	int screenPointY[2] = {50,screen->viewHeight-50};
+	int touchPointXY[2];
+	int touchPointX[2];
+	int touchPointY[2];
+
+	calibratePoint(screenPointXY, touchPointXY);
+	calibratePoint(screenPointX, touchPointX);
+	calibratePoint(screenPointY, touchPointY);
+
+	if ((std::abs(touchPointXY[0]-touchPointX[0])<std::abs(touchPointXY[1]-touchPointX[1]))&&
+			(std::abs(touchPointXY[1]-touchPointY[1])<std::abs(touchPointXY[0]-touchPointY[0]))) {
+		touchFlipXY=true;
+	}
+
+	float dotsPerPixelX= (float)(touchPointX[touchFlipXY]-touchPointXY[touchFlipXY])/
+			(float)(screenPointX[0]-screenPointXY[0]);
+	float dotsPerPixelY= (float)(touchPointY[!touchFlipXY]-touchPointXY[!touchFlipXY])/
+			(float)(screenPointY[1]-screenPointXY[1]);
+
+	touchZeroX=touchPointXY[touchFlipXY]-(screenPointXY[0]*dotsPerPixelX);
+	touchZeroY=touchPointXY[!touchFlipXY]-(screenPointXY[1]*dotsPerPixelY);
+	touchWidth=touchPointX[touchFlipXY]+((screen->viewWidth-screenPointX[0])*dotsPerPixelX);
+	touchHeight=touchPointY[!touchFlipXY]+((screen->viewHeight-screenPointY[1])*dotsPerPixelY);
+
 	calibrating=false;
 	screen->draw();
 	if (confFile.is_open()) {
