@@ -27,6 +27,11 @@
 
 #include "touch.h"
 
+// this gets changed to be in the home folder if we compile without root
+#ifndef CONF_LOC
+	#define CONF_LOC "/etc/spi-display.conf"
+#endif
+
 using namespace LCDDisplay;
 
 Touchscreen::Touchscreen(Screen* tmpScreen, const char * device) {
@@ -34,7 +39,7 @@ Touchscreen::Touchscreen(Screen* tmpScreen, const char * device) {
 	calibrating=false;
 
 	// load config
-	confFile.open("/etc/spi-display.conf", std::ios::in | std::ios::out);
+	confFile.open(CONF_LOC, std::ios::in | std::ios::out);
 	if (confFile.is_open()) {
 		// Setup options from file
 		std::istream& conf = confFile;
@@ -76,8 +81,9 @@ Touchscreen::Touchscreen(Screen* tmpScreen, const char * device) {
 		return;
 	}
 	listenerThread = new std::thread(&Touchscreen::listenForEvents, this);
+
 	if (!confFile.is_open()) {
-		confFile.open("/etc/spi-display.conf", std::ios::out);
+		confFile.open(CONF_LOC, std::ios::out);
 		if (!confFile.is_open()) {
 			std::cerr << "Conf file could not be opened or created; all configuration will be temporary" << '\n';
 		}
@@ -151,6 +157,7 @@ void Touchscreen::eventRecieved(unsigned int type, unsigned int code, int value)
 	}
 }
 void Touchscreen::recievedTouchUp() {
+	// TODO if holding, send hold. If draging, send drag end. Otherwise send click
 	touchX=-1;
 	touchY=-1;
 	initialTouchX=-1;
@@ -163,13 +170,17 @@ void Touchscreen::recievedTouchDown() {
 		std::lock_guard<std::mutex> lk(caliMutex);
 		caliWaitingForTouch=false;
 		caliConditionVariable.notify_one();
+
+		// return;
 	}
 	initialTouch=false;
 }
 void Touchscreen::recievedMove() {
+	// TODO if the move triggers a drag, cancel the initialTouchTime so we stop listening for a hold
 	printf("Move to: %i,%i\n", touchX, touchY);
 }
 void Touchscreen::recievedHold() {
+	// TODO draw indicator rectangle to screen, don't send hold event untill touchUp
 	printf("Recieved hold\n");
 }
 void Touchscreen::calibrate() {
@@ -180,6 +191,7 @@ void Touchscreen::calibrate() {
 	int touchPointXY[2];
 	int touchPointX[2];
 	int touchPointY[2];
+	// TODO: disable screen updates from other sources while calibrating
 
 	calibratePoint(screenPointXY, touchPointXY);
 	calibratePoint(screenPointX, touchPointX);
@@ -211,6 +223,7 @@ void Touchscreen::calibratePoint(int* screenLocation, int* touchPoint) {
 	screen->drawRect(screenLocation[0]-5,screenLocation[1]-5,10,10,0x444444);
 	screen->drawRect(screenLocation[0]-5,screenLocation[1],10,1,0xffffff);
 	screen->drawRect(screenLocation[0],screenLocation[1]-5,1,10,0xffffff);
+
 	caliWaitingForTouch=true;
 	std::unique_lock<std::mutex> lk(caliMutex);
 	// Can't use wait(lock, predi) for a non-static variable
@@ -219,4 +232,5 @@ void Touchscreen::calibratePoint(int* screenLocation, int* touchPoint) {
 	}
 	touchPoint[0]=initialTouchX;
 	touchPoint[1]=initialTouchY;
+	// TODO release touch event
 }

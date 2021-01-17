@@ -61,5 +61,11 @@ namespace LCDDisplay {
 		View* getParent();
 		View** getChildrenArrayAddress();
 		int getChildCount();
+
+		void recieveClick(int x, int y);
+		void beginDrag(int x, int y);
+		void dragTo(int x, int y);
+		void endDrag();
+		void recieveHold(int x, int y);
 	};
 } /* LCDDisplay */
